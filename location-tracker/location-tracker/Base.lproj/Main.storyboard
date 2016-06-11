@@ -35,6 +35,12 @@
                                     </switch>
                                 </subviews>
                             </stackView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="API Response: 404" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pCw-bK-Mr2">
+                                <rect key="frame" x="20" y="67" width="146" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -44,6 +50,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="apiResponseLabel" destination="pCw-bK-Mr2" id="sF5-qC-p85"/>
                         <outlet property="broadcastToggle" destination="onw-Fz-9Dd" id="FhK-rd-qE7"/>
                     </connections>
                 </viewController>

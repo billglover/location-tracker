@@ -11,6 +11,7 @@ import CoreLocation
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
+    @IBOutlet weak var apiResponseLabel: UILabel!
     @IBOutlet weak var broadcastToggle: UISwitch!
     let locationManager = CLLocationManager()
 
@@ -53,6 +54,36 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func stopBroadcastingLocation() {
         broadcastToggle.on = false
         locationManager.stopUpdatingLocation()
+    }
+    
+    func submitLocation(location: CLLocation) {
+        let url = NSURL(string: "https://locationapi.localtunnel.me/locations")
+        let session = NSURLSession.sharedSession()
+        let request = NSMutableURLRequest(URL: url!)
+        request.HTTPMethod = "POST"
+        
+        let date = location.timestamp
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.timeZone = NSTimeZone.localTimeZone()
+        
+        let data = "{\"latitude\":\(location.coordinate.latitude),\"longitude\":\(location.coordinate.longitude),\"altitude\":\(location.altitude),\"horizontalAccuracy\":\(location.horizontalAccuracy),\"verticalAccuracy\":\(location.verticalAccuracy),\"devicetime\":\"\(formatter.stringFromDate(date))\",\"description\":\"iOS device\"}"
+        print(formatter.stringFromDate(date))
+        request.HTTPBody = data.dataUsingEncoding(NSUTF8StringEncoding)
+        
+        let task = session.dataTaskWithRequest(request){
+            data, response, error in
+            if(error != nil){
+                print(error)
+            }
+            dispatch_async(dispatch_get_main_queue()){
+                print((response as! NSHTTPURLResponse).statusCode)
+                self.apiResponseLabel.text = "API Response: \((response as! NSHTTPURLResponse).statusCode)"
+            }
+            
+        }
+        task.resume()
+        
     }
     
 
@@ -99,6 +130,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         for location in locations {
             print("Location: \(location.coordinate)")
+            submitLocation(location)
         }
     }
 }
