@@ -158,6 +158,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
         
     }
+    @IBAction func postLocationPressed(sender: UIButton) {
+        print("postLocationPressed")
+        
+        switch CLLocationManager.authorizationStatus() {
+        case .AuthorizedAlways:
+            locationManager.requestLocation()
+        case .AuthorizedWhenInUse:
+            locationManager.requestLocation()
+        case .Denied:
+            print("Denied")
+        case .NotDetermined:
+            print("NotDetermined")
+        case .Restricted:
+            print("Restricted")
+        }
+    }
     
     // MARK:- LocationManger Delegates
     func locationManager(manager: CLLocationManager, didChangeAuthorizationStatus status: CLAuthorizationStatus) {
