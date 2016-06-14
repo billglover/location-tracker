@@ -300,6 +300,7 @@
 				A98C711E1D0C53DE001E5F99 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
