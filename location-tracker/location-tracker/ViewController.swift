@@ -97,7 +97,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         formatter.timeZone = NSTimeZone.localTimeZone()
         
-        let data = "{\"latitude\":\(location.coordinate.latitude),\"longitude\":\(location.coordinate.longitude),\"altitude\":\(location.altitude),\"horizontalAccuracy\":\(location.horizontalAccuracy),\"verticalAccuracy\":\(location.verticalAccuracy),\"devicetime\":\"\(formatter.stringFromDate(date))\",\"description\":\"location\"}"
+        let data = "[{\"latitude\":\(location.coordinate.latitude),\"longitude\":\(location.coordinate.longitude),\"altitude\":\(location.altitude),\"horizontalAccuracy\":\(location.horizontalAccuracy),\"verticalAccuracy\":\(location.verticalAccuracy),\"devicetime\":\"\(formatter.stringFromDate(date))\",\"description\":\"location\"}]"
         print(formatter.stringFromDate(date))
         request.HTTPBody = data.dataUsingEncoding(NSUTF8StringEncoding)
         
@@ -127,7 +127,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         formatter.timeZone = NSTimeZone.localTimeZone()
         
-        let data = "{\"latitude\":\(visit.coordinate.latitude),\"longitude\":\(visit.coordinate.longitude),\"horizontalAccuracy\":\(visit.horizontalAccuracy),\"devicetime\":\"\(formatter.stringFromDate(date))\",\"description\":\"visit\"}"
+        let data = "[{\"latitude\":\(visit.coordinate.latitude),\"longitude\":\(visit.coordinate.longitude),\"horizontalAccuracy\":\(visit.horizontalAccuracy),\"devicetime\":\"\(formatter.stringFromDate(date))\",\"description\":\"visit\"}]"
         print(formatter.stringFromDate(date))
         request.HTTPBody = data.dataUsingEncoding(NSUTF8StringEncoding)
         
