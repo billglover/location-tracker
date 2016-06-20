@@ -16,7 +16,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var visitCounter: UILabel!
     @IBOutlet weak var locationCounter: UILabel!
     let locationManager = CLLocationManager()
-
+    
     var visits :Int {
         set {
             visitCounter.text = "\(newValue)"
@@ -46,7 +46,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.delegate = self
         
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -78,28 +78,65 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }
         }
     }
-        
+    
     func stopBroadcastingLocation() {
         broadcastToggle.on = false
         locationManager.stopMonitoringSignificantLocationChanges()
         locationManager.stopMonitoringVisits()
     }
     
-    func submitLocation(location: CLLocation) {
+    func submitVisit(visit: CLVisit) {
+        let a = [visit.asDictionary]
+        var body: String?
+        
+        do {
+            let opts = NSJSONWritingOptions()
+            let data = try NSJSONSerialization.dataWithJSONObject(a, options: opts)
+            
+            body = NSString(data: data, encoding: NSUTF8StringEncoding) as? String
+        }
+        catch let e as NSException {
+            print(e.reason!)
+        }
+        catch let e as NSError {
+            print(e.localizedDescription)
+        }
+        
+        if body != nil {
+            postLocationsWith(body!)
+        }
+    }
+    
+    func submitLocations(locations: [CLLocation]) {
+        let a = locations.map({$0.asDictionary})
+        var body: String?
+        
+        do {
+            let opts = NSJSONWritingOptions()
+            let data = try NSJSONSerialization.dataWithJSONObject(a, options: opts)
+            
+            body = NSString(data: data, encoding: NSUTF8StringEncoding) as? String
+        }
+        catch let e as NSException {
+            print(e.reason!)
+        }
+        catch let e as NSError {
+            print(e.localizedDescription)
+        }
+        
+        if body != nil {
+            postLocationsWith(body!)
+        }
+    }
+    
+    func postLocationsWith(body: String) {
         //let url = NSURL(string: "https://locationapi.localtunnel.me/locations")
         let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
         let session = NSURLSession.sharedSession()
         let request = NSMutableURLRequest(URL: url!)
         request.HTTPMethod = "POST"
         
-        let date = location.timestamp
-        let formatter = NSDateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-        formatter.timeZone = NSTimeZone.localTimeZone()
-        
-        let data = "[{\"latitude\":\(location.coordinate.latitude),\"longitude\":\(location.coordinate.longitude),\"altitude\":\(location.altitude),\"horizontalAccuracy\":\(location.horizontalAccuracy),\"verticalAccuracy\":\(location.verticalAccuracy),\"devicetime\":\"\(formatter.stringFromDate(date))\",\"description\":\"location\"}]"
-        print(formatter.stringFromDate(date))
-        request.HTTPBody = data.dataUsingEncoding(NSUTF8StringEncoding)
+        request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding)
         
         let task = session.dataTaskWithRequest(request){
             data, response, error in
@@ -113,40 +150,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             
         }
         task.resume()
-        
     }
     
-    func submitVisit(visit: CLVisit) {
-        let url = NSURL(string: "https://locationapi.localtunnel.me/locations")
-        let session = NSURLSession.sharedSession()
-        let request = NSMutableURLRequest(URL: url!)
-        request.HTTPMethod = "POST"
-        
-        let date = visit.arrivalDate
-        let formatter = NSDateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
-        formatter.timeZone = NSTimeZone.localTimeZone()
-        
-        let data = "[{\"latitude\":\(visit.coordinate.latitude),\"longitude\":\(visit.coordinate.longitude),\"horizontalAccuracy\":\(visit.horizontalAccuracy),\"devicetime\":\"\(formatter.stringFromDate(date))\",\"description\":\"visit\"}]"
-        print(formatter.stringFromDate(date))
-        request.HTTPBody = data.dataUsingEncoding(NSUTF8StringEncoding)
-        
-        let task = session.dataTaskWithRequest(request){
-            data, response, error in
-            if(error != nil){
-                print(error)
-            }
-            dispatch_async(dispatch_get_main_queue()){
-                print((response as! NSHTTPURLResponse).statusCode)
-                self.apiResponseLabel.text = "API Response: \((response as! NSHTTPURLResponse).statusCode)"
-            }
-            
-        }
-        task.resume()
-        
-    }
     
-
+    
     // MARK:- User Action
     @IBAction func broadcastToggled(sender: UISwitch) {
         print("broadcastToggled to \(sender.on)")
@@ -204,11 +211,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        for location in locations {
-            self.locations = self.locations + 1
-            print("Location: \(location.coordinate)")
-            submitLocation(location)
-        }
+        submitLocations(locations)
     }
     
     func locationManager(manager: CLLocationManager, didVisit visit: CLVisit) {
