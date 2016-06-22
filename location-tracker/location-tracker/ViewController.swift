@@ -88,7 +88,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 locationManager.allowsBackgroundLocationUpdates = true
                 locationManager.allowDeferredLocationUpdatesUntilTraveled(CLLocationDistanceMax, timeout: CLTimeIntervalMax)
                 locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-                locationManager.activityType = .Other
+                locationManager.pausesLocationUpdatesAutomatically = false
                 locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
                 locationManager.startMonitoringSignificantLocationChanges()
             case .AuthorizedWhenInUse:
@@ -96,7 +96,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 locationManager.allowsBackgroundLocationUpdates = true
                 locationManager.allowDeferredLocationUpdatesUntilTraveled(CLLocationDistanceMax, timeout: CLTimeIntervalMax)
                 locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-                locationManager.activityType = .Other
+                locationManager.pausesLocationUpdatesAutomatically = false
                 locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
                 locationManager.startMonitoringSignificantLocationChanges()
             case .Denied:
