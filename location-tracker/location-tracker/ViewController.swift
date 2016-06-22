@@ -49,6 +49,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
     }
     
+    override func viewWillAppear(animated: Bool) {
+        // Get the default Realm
+        let realm = try! Realm()
+        let locations = realm.objects(Location.self)
+        let visits = realm.objects(Visit.self)
+        locationCounter.text = "\(locations.count)"
+        visitCounter.text = "\(visits.count)"
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -128,6 +137,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func submitVisit(visit: CLVisit) {
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
+        realm.beginWrite()
+        realm.add(Visit(visit: visit))
+        try! realm.commitWrite()
+        
         let a = [visit.asDictionary]
         var body: String?
         
@@ -182,25 +197,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     func postLocationsWith(body: String) {
         //let url = NSURL(string: "https://locationapi.localtunnel.me/locations")
-//        let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
-//        let session = NSURLSession.sharedSession()
-//        let request = NSMutableURLRequest(URL: url!)
-//        request.HTTPMethod = "POST"
-//        
-//        request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding)
-//        
-//        let task = session.dataTaskWithRequest(request){
-//            data, response, error in
-//            if(error != nil){
-//                print(error)
-//            }
-//            dispatch_async(dispatch_get_main_queue()){
-//                print((response as! NSHTTPURLResponse).statusCode)
-//                self.apiResponseLabel.text = "API Response: \((response as! NSHTTPURLResponse).statusCode)"
-//            }
-//            
-//        }
-//        task.resume()
+        let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
+        let session = NSURLSession.sharedSession()
+        let request = NSMutableURLRequest(URL: url!)
+        request.HTTPMethod = "POST"
+        
+        request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding)
+        
+        let task = session.dataTaskWithRequest(request){
+            data, response, error in
+            if(error != nil){
+                print(error)
+            }
+            dispatch_async(dispatch_get_main_queue()){
+                print((response as! NSHTTPURLResponse).statusCode)
+                self.apiResponseLabel.text = "API Response: \((response as! NSHTTPURLResponse).statusCode)"
+            }
+            
+        }
+        task.resume()
     }
     
     

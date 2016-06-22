@@ -12,6 +12,7 @@
 		A97C3C661D1B1B9B008BC4B2 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A97C3C631D1B1B9B008BC4B2 /* RealmSwift.framework */; };
 		A97C3C671D1B1B9B008BC4B2 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A97C3C631D1B1B9B008BC4B2 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A97C40B81D1B1CF00063BF10 /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = A97C40B71D1B1CF00063BF10 /* Location.swift */; };
+		A97C40BA1D1B38E40063BF10 /* Visit.swift in Sources */ = {isa = PBXBuildFile; fileRef = A97C40B91D1B38E40063BF10 /* Visit.swift */; };
 		A98C710E1D0C53DE001E5F99 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98C710D1D0C53DE001E5F99 /* AppDelegate.swift */; };
 		A98C71101D0C53DE001E5F99 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98C710F1D0C53DE001E5F99 /* ViewController.swift */; };
 		A98C71131D0C53DE001E5F99 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A98C71111D0C53DE001E5F99 /* Main.storyboard */; };
@@ -40,6 +41,7 @@
 		A97C3C621D1B1B9B008BC4B2 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = "<group>"; };
 		A97C3C631D1B1B9B008BC4B2 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = "<group>"; };
 		A97C40B71D1B1CF00063BF10 /* Location.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Location.swift; path = Models/Location.swift; sourceTree = "<group>"; };
+		A97C40B91D1B38E40063BF10 /* Visit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Visit.swift; path = Models/Visit.swift; sourceTree = "<group>"; };
 		A98C710A1D0C53DE001E5F99 /* location-tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "location-tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A98C710D1D0C53DE001E5F99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A98C710F1D0C53DE001E5F99 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				A97C40B71D1B1CF00063BF10 /* Location.swift */,
+				A97C40B91D1B38E40063BF10 /* Visit.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -206,6 +209,7 @@
 				A97C40B81D1B1CF00063BF10 /* Location.swift in Sources */,
 				A98C710E1D0C53DE001E5F99 /* AppDelegate.swift in Sources */,
 				A9ADAE4F1D17157C008E7A28 /* Location-Extension.swift in Sources */,
+				A97C40BA1D1B38E40063BF10 /* Visit.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
