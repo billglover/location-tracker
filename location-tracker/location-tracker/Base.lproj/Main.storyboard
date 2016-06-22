@@ -19,7 +19,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="KbZ-vB-71e">
-                                <rect key="frame" x="20" y="28" width="560" height="141"/>
+                                <rect key="frame" x="20" y="28" width="560" height="182"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="xbM-p7-pIX">
                                         <rect key="frame" x="0.0" y="0.0" width="560" height="31"/>
@@ -38,8 +38,25 @@
                                             </switch>
                                         </subviews>
                                     </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Tsh-j5-24j">
+                                        <rect key="frame" x="0.0" y="41" width="560" height="31"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Track movement" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="doS-c2-ZBo">
+                                                <rect key="frame" x="0.0" y="0.0" width="511" height="31"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hYF-op-Jr3">
+                                                <rect key="frame" x="511" y="0.0" width="51" height="31"/>
+                                                <connections>
+                                                    <action selector="movementToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="dj5-Z8-T1r"/>
+                                                </connections>
+                                            </switch>
+                                        </subviews>
+                                    </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Rkd-G4-AjP">
-                                        <rect key="frame" x="0.0" y="41" width="560" height="21"/>
+                                        <rect key="frame" x="0.0" y="82" width="560" height="21"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="API Response: 404" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pCw-bK-Mr2">
                                                 <rect key="frame" x="0.0" y="0.0" width="560" height="21"/>
@@ -50,7 +67,7 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="KXE-Ik-uJT">
-                                        <rect key="frame" x="0.0" y="72" width="560" height="69"/>
+                                        <rect key="frame" x="0.0" y="113" width="560" height="69"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Tf-1a-OBF">
                                                 <rect key="frame" x="0.0" y="0.0" width="275" height="69"/>
@@ -90,6 +107,7 @@
                         <outlet property="apiResponseLabel" destination="pCw-bK-Mr2" id="sF5-qC-p85"/>
                         <outlet property="broadcastToggle" destination="onw-Fz-9Dd" id="FhK-rd-qE7"/>
                         <outlet property="locationCounter" destination="B7k-BY-fCd" id="MQj-mG-5ml"/>
+                        <outlet property="movementToggle" destination="hYF-op-Jr3" id="o0x-MX-5nN"/>
                         <outlet property="visitCounter" destination="0Tf-1a-OBF" id="88t-i6-P40"/>
                     </connections>
                 </viewController>
