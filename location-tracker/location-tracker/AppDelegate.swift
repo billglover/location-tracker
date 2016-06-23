@@ -17,6 +17,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // Get our Realm file's parent directory
+        let folderPath = realm.configuration.fileURL!.URLByDeletingLastPathComponent!.path!
+        
+        // Disable file protection for this directory
+        try! NSFileManager.defaultManager().setAttributes([NSFileProtectionKey: NSFileProtectionNone], ofItemAtPath: folderPath)
+        
         return true
     }
 

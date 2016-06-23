@@ -18,6 +18,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var locationCounter: UILabel!
     @IBOutlet weak var movementToggle: UISwitch!
     let locationManager = CLLocationManager()
+    var token: NotificationToken?
     
     var visits :Int {
         set {
@@ -50,12 +51,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     override func viewWillAppear(animated: Bool) {
-        // Get the default Realm
-        let realm = try! Realm()
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
+        token = realm.addNotificationBlock { notification, realm in
+            self.updateCounters()
+        }
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        if token != nil {
+            token!.stop()
+        }
+    }
+    
+    func updateCounters() {
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
         let locations = realm.objects(Location.self)
         let visits = realm.objects(Visit.self)
-        locationCounter.text = "\(locations.count)"
-        visitCounter.text = "\(visits.count)"
+        self.locations = locations.count
+        self.visits = visits.count
     }
     
     override func didReceiveMemoryWarning() {
