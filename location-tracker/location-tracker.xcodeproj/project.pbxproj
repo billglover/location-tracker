@@ -69,10 +69,23 @@
 		A97C40B61D1B1CC90063BF10 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				A9ADAE501D171BB3008E7A28 /* Visit-Extension.swift */,
+				A9ADAE4E1D17157C008E7A28 /* Location-Extension.swift */,
 				A97C40B71D1B1CF00063BF10 /* Location.swift */,
 				A97C40B91D1B38E40063BF10 /* Visit.swift */,
 			);
 			name = Models;
+			sourceTree = "<group>";
+		};
+		A97C40BB1D1BB4490063BF10 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A98C710D1D0C53DE001E5F99 /* AppDelegate.swift */,
+				A98C71141D0C53DE001E5F99 /* Assets.xcassets */,
+				A98C71161D0C53DE001E5F99 /* LaunchScreen.storyboard */,
+				A98C71191D0C53DE001E5F99 /* Info.plist */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		A98C71011D0C53DE001E5F99 = {
@@ -97,14 +110,9 @@
 			isa = PBXGroup;
 			children = (
 				A97C40B61D1B1CC90063BF10 /* Models */,
-				A9ADAE501D171BB3008E7A28 /* Visit-Extension.swift */,
-				A9ADAE4E1D17157C008E7A28 /* Location-Extension.swift */,
-				A98C710D1D0C53DE001E5F99 /* AppDelegate.swift */,
+				A97C40BB1D1BB4490063BF10 /* Supporting Files */,
 				A98C710F1D0C53DE001E5F99 /* ViewController.swift */,
 				A98C71111D0C53DE001E5F99 /* Main.storyboard */,
-				A98C71141D0C53DE001E5F99 /* Assets.xcassets */,
-				A98C71161D0C53DE001E5F99 /* LaunchScreen.storyboard */,
-				A98C71191D0C53DE001E5F99 /* Info.plist */,
 			);
 			path = "location-tracker";
 			sourceTree = "<group>";
