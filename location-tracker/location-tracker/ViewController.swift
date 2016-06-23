@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreLocation
+import RealmSwift
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
@@ -17,6 +18,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var locationCounter: UILabel!
     @IBOutlet weak var movementToggle: UISwitch!
     let locationManager = CLLocationManager()
+    var token: NotificationToken?
     
     var visits :Int {
         set {
@@ -46,6 +48,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         // Do any additional setup after loading the view, typically from a nib.
         locationManager.delegate = self
         
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
+        token = realm.addNotificationBlock { notification, realm in
+            self.updateCounters()
+        }
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        if token != nil {
+            token!.stop()
+        }
+    }
+    
+    func updateCounters() {
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
+        let locations = realm.objects(Location.self)
+        let visits = realm.objects(Visit.self)
+        self.locations = locations.count
+        self.visits = visits.count
     }
     
     override func didReceiveMemoryWarning() {
@@ -127,6 +152,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func submitVisit(visit: CLVisit) {
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
+        realm.beginWrite()
+        realm.add(Visit(visit: visit))
+        try! realm.commitWrite()
+        
         let a = [visit.asDictionary]
         var body: String?
         
@@ -149,6 +180,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func submitLocations(locations: [CLLocation]) {
+        
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
+        realm.beginWrite()
+        for loc in locations {
+            realm.add(Location(loc: loc))
+        }
+        try! realm.commitWrite()
+        
         let a = locations.map({$0.asDictionary})
         var body: String?
         
