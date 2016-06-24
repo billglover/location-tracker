@@ -13,29 +13,32 @@ import RealmSwift
 class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var apiResponseLabel: UILabel!
-    @IBOutlet weak var broadcastToggle: UISwitch!
+    @IBOutlet weak var trackVisitsToggle: UISwitch!
     @IBOutlet weak var visitCounter: UILabel!
     @IBOutlet weak var locationCounter: UILabel!
-    @IBOutlet weak var movementToggle: UISwitch!
     @IBOutlet weak var trackLocationToggle: UISwitch!
     let locationManager = CLLocationManager()
     var token: NotificationToken?
     
     var visits :Int {
         set {
-            visitCounter.text = "\(newValue)"
+            visitCounter.text = "\(newValue) visits"
         }
         get {
-            return Int(visitCounter.text!)!
+            let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+            let realm = ad.realm
+            return realm.objects(Visit.self).count
         }
     }
     
     var locations :Int {
         set {
-            locationCounter.text = "\(newValue)"
+            locationCounter.text = "\(newValue) points"
         }
         get {
-            return Int(locationCounter.text!)!
+            let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+            let realm = ad.realm
+            return realm.objects(Location.self).count
         }
     }
     
@@ -79,15 +82,50 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    func startBroadcastingVisits() {
+        if trackVisitsToggle.on {
+            switch CLLocationManager.authorizationStatus() {
+            case .AuthorizedAlways:
+                print("AuthorizedAlways")
+                locationManager.startMonitoringVisits()
+            case .AuthorizedWhenInUse:
+                print("AuthorizedWhenInUse")
+                locationManager.startMonitoringVisits()
+            case .Denied:
+                print("Denied")
+                stopBroadcastingVisits()
+                let alertViewController = UIAlertController(title: "Denied", message: "You have denied access to your location. You will need to visit your privacy settings to enable access.", preferredStyle: .Alert)
+                alertViewController.addAction(UIAlertAction(title: "Understood", style: UIAlertActionStyle.Default, handler: nil))
+                self.presentViewController(alertViewController, animated: true, completion: nil)
+            case .NotDetermined:
+                print("NotDetermined")
+                locationManager.requestAlwaysAuthorization()
+            case .Restricted:
+                print("Restricted")
+                stopBroadcastingVisits()
+            }
+        }
+    }
+    
     func startBroadcastingLocation() {
-        if broadcastToggle.on {
+        if trackLocationToggle.on {
             switch CLLocationManager.authorizationStatus() {
             case .AuthorizedAlways:
                 print("AuthorizedAlways")
-                locationManager.startMonitoringVisits()
+                locationManager.allowsBackgroundLocationUpdates = true
+                //locationManager.allowDeferredLocationUpdatesUntilTraveled(CLLocationDistanceMax, timeout: CLTimeIntervalMax)
+                locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+                locationManager.pausesLocationUpdatesAutomatically = false
+                locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
+                locationManager.startUpdatingLocation()
             case .AuthorizedWhenInUse:
                 print("AuthorizedWhenInUse")
-                locationManager.startMonitoringVisits()
+                locationManager.allowsBackgroundLocationUpdates = true
+                //locationManager.allowDeferredLocationUpdatesUntilTraveled(CLLocationDistanceMax, timeout: CLTimeIntervalMax)
+                locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+                locationManager.pausesLocationUpdatesAutomatically = false
+                locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
+                locationManager.startUpdatingLocation()
             case .Denied:
                 print("Denied")
                 stopBroadcastingLocation()
@@ -104,49 +142,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func startBroadcastingMovement() {
-        if broadcastToggle.on {
-            switch CLLocationManager.authorizationStatus() {
-            case .AuthorizedAlways:
-                print("AuthorizedAlways")
-                locationManager.allowsBackgroundLocationUpdates = true
-                locationManager.allowDeferredLocationUpdatesUntilTraveled(CLLocationDistanceMax, timeout: CLTimeIntervalMax)
-                locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-                locationManager.pausesLocationUpdatesAutomatically = false
-                locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
-                locationManager.startUpdatingLocation()
-            case .AuthorizedWhenInUse:
-                print("AuthorizedWhenInUse")
-                locationManager.allowsBackgroundLocationUpdates = true
-                locationManager.allowDeferredLocationUpdatesUntilTraveled(CLLocationDistanceMax, timeout: CLTimeIntervalMax)
-                locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
-                locationManager.pausesLocationUpdatesAutomatically = false
-                locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
-                locationManager.startUpdatingLocation()
-            case .Denied:
-                print("Denied")
-                stopBroadcastingLocation()
-                let alertViewController = UIAlertController(title: "Denied", message: "You have denied access to your location. You will need to visit your privacy settings to enable access.", preferredStyle: .Alert)
-                alertViewController.addAction(UIAlertAction(title: "Understood", style: UIAlertActionStyle.Default, handler: nil))
-                self.presentViewController(alertViewController, animated: true, completion: nil)
-            case .NotDetermined:
-                print("NotDetermined")
-                locationManager.requestAlwaysAuthorization()
-            case .Restricted:
-                print("Restricted")
-                stopBroadcastingMovement()
-            }
-        }
-    }
-    
-    func stopBroadcastingLocation() {
-        broadcastToggle.on = false
-        locationManager.stopMonitoringSignificantLocationChanges()
+    func stopBroadcastingVisits() {
+        trackVisitsToggle.on = false
         locationManager.stopMonitoringVisits()
     }
     
-    func stopBroadcastingMovement() {
-        movementToggle.on = false
+    func stopBroadcastingLocation() {
+        trackLocationToggle.on = false
         locationManager.stopUpdatingLocation()
     }
     
@@ -235,24 +237,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     
     // MARK:- User Action
-    @IBAction func broadcastToggled(sender: UISwitch) {
-        print("broadcastToggled to \(sender.on)")
+    @IBAction func trackVisitsToggled(sender: UISwitch) {
+        print("broadcastVisits to \(sender.on)")
+        
+        if sender.on {
+            startBroadcastingVisits()
+        } else {
+            stopBroadcastingVisits()
+        }
+        
+    }
+    
+    @IBAction func trackLocationToggled(sender: UISwitch) {
+        print("broadcastLocations to \(sender.on)")
         
         if sender.on {
             startBroadcastingLocation()
         } else {
             stopBroadcastingLocation()
-        }
-        
-    }
-    
-    @IBAction func movementToggled(sender: UISwitch) {
-        print("broadcastToggled to \(sender.on)")
-        
-        if sender.on {
-            startBroadcastingMovement()
-        } else {
-            stopBroadcastingMovement()
         }
     }
     
@@ -302,11 +304,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        for loc in locations {
+            print("Located: \(loc.coordinate) at \(loc.timestamp)")
+        }
         submitLocations(locations)
     }
     
     func locationManager(manager: CLLocationManager, didVisit visit: CLVisit) {
-        self.visits = self.visits + 1
         print("Visited: \(visit.coordinate) at \(visit.arrivalDate)")
         submitVisit(visit)
     }
