@@ -17,6 +17,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var visitCounter: UILabel!
     @IBOutlet weak var locationCounter: UILabel!
     @IBOutlet weak var movementToggle: UISwitch!
+    @IBOutlet weak var trackLocationToggle: UISwitch!
     let locationManager = CLLocationManager()
     var token: NotificationToken?
     
@@ -84,11 +85,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             case .AuthorizedAlways:
                 print("AuthorizedAlways")
                 locationManager.startMonitoringVisits()
-                locationManager.startMonitoringSignificantLocationChanges()
             case .AuthorizedWhenInUse:
                 print("AuthorizedWhenInUse")
                 locationManager.startMonitoringVisits()
-                locationManager.startMonitoringSignificantLocationChanges()
             case .Denied:
                 print("Denied")
                 stopBroadcastingLocation()
@@ -115,7 +114,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
                 locationManager.pausesLocationUpdatesAutomatically = false
                 locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
-                locationManager.startMonitoringSignificantLocationChanges()
+                locationManager.startUpdatingLocation()
             case .AuthorizedWhenInUse:
                 print("AuthorizedWhenInUse")
                 locationManager.allowsBackgroundLocationUpdates = true
@@ -123,7 +122,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
                 locationManager.pausesLocationUpdatesAutomatically = false
                 locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
-                locationManager.startMonitoringSignificantLocationChanges()
+                locationManager.startUpdatingLocation()
             case .Denied:
                 print("Denied")
                 stopBroadcastingLocation()
