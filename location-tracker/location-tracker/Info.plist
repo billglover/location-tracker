@@ -25,7 +25,7 @@
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<false/>
 	</dict>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Location updates are broadcast remotely for the purposes of testing. It is possible to disable broadcast within the app.</string>

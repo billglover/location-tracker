@@ -212,8 +212,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func postLocationsWith(body: String) {
-        //let url = NSURL(string: "https://locationapi.localtunnel.me/locations")
-        let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
+        //let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
+        let url = NSURL(string: "https://api.billglover.me/locations")
         let session = NSURLSession.sharedSession()
         let request = NSMutableURLRequest(URL: url!)
         request.HTTPMethod = "POST"
