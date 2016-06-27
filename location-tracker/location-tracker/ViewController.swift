@@ -58,7 +58,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         let ad = UIApplication.sharedApplication().delegate as! AppDelegate
         let realm = ad.realm
         token = realm.addNotificationBlock { notification, realm in
-            self.updateCounters()
+            self.realmDidChange(realm)
         }
     }
     
@@ -68,19 +68,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
     }
     
-    func updateCounters() {
-        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
-        let realm = ad.realm
+    func updateCountersFromRealm(realm: Realm) {
         let locations = realm.objects(Location.self)
         let visits = realm.objects(Visit.self)
         self.locations = locations.count
         self.visits = visits.count
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
+
     
     func startBroadcastingVisits() {
         if trackVisitsToggle.on {
@@ -152,36 +147,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.stopUpdatingLocation()
     }
     
-    func submitVisit(visit: CLVisit) {
-        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
-        let realm = ad.realm
-        realm.beginWrite()
-        realm.add(Visit(visit: visit))
-        try! realm.commitWrite()
-        
-        let a = [visit.asDictionary]
-        var body: String?
-        
-        do {
-            let opts = NSJSONWritingOptions()
-            let data = try NSJSONSerialization.dataWithJSONObject(a, options: opts)
-            
-            body = NSString(data: data, encoding: NSUTF8StringEncoding) as? String
-        }
-        catch let e as NSException {
-            print(e.reason!)
-        }
-        catch let e as NSError {
-            print(e.localizedDescription)
-        }
-        
-        if body != nil {
-            postLocationsWith(body!)
-        }
-    }
     
-    func submitLocations(locations: [CLLocation]) {
-        
+    
+    
+    
+    // MARK:- Realm Operations
+    func queueLocations(locations: [CLLocation]) {
         let ad = UIApplication.sharedApplication().delegate as! AppDelegate
         let realm = ad.realm
         realm.beginWrite()
@@ -189,50 +160,166 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             realm.add(Location(loc: loc))
         }
         try! realm.commitWrite()
+    }
+    
+    func queueVisit(visit: CLVisit) {
+        let ad = UIApplication.sharedApplication().delegate as! AppDelegate
+        let realm = ad.realm
+        realm.beginWrite()
+        realm.add(Visit(visit: visit))
+        try! realm.commitWrite()
+    }
+    
+    func realmDidChange(realm: Realm) {
+        submitLocationsFromRealm(realm)
+        submitVisitsFromRealm(realm)
+        updateCountersFromRealm(realm)
+    }
+    
+    func submitLocationsFromRealm(realm: Realm) {
         
-        let a = locations.map({$0.asDictionary})
-        var body: String?
+        let locations = realm.objects(Location.self)
         
-        do {
-            let opts = NSJSONWritingOptions()
-            let data = try NSJSONSerialization.dataWithJSONObject(a, options: opts)
+        // if there are no queued locations we don't need to do anything
+        if locations.count > 0 {
             
-            body = NSString(data: data, encoding: NSUTF8StringEncoding) as? String
-        }
-        catch let e as NSException {
-            print(e.reason!)
-        }
-        catch let e as NSError {
-            print(e.localizedDescription)
-        }
+            print("Queued Locations: \(locations.count)")
+            
+            // convert Results<Location> to JSON
+            let a = locations.map({$0.asDictionary})
+            var body: String?
+            
+            do {
+                let opts = NSJSONWritingOptions()
+                let data = try NSJSONSerialization.dataWithJSONObject(a, options: opts)
+                
+                body = NSString(data: data, encoding: NSUTF8StringEncoding) as? String
+            }
+            catch let e as NSException {
+                print(e.reason!)
+            }
+            catch let e as NSError {
+                print(e.localizedDescription)
+            }
+            
+            // check that we have a JSON string and the submit
+            if body != nil {
+                
+                // create the POST request
+                //let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
+                let url = NSURL(string: "https://api.billglover.me/locations")
+                let session = NSURLSession.sharedSession()
+                let request = NSMutableURLRequest(URL: url!)
+                request.HTTPMethod = "POST"
+                request.HTTPBody = body!.dataUsingEncoding(NSUTF8StringEncoding)
         
-        if body != nil {
-            postLocationsWith(body!)
+                // create the submission task
+                let task = session.dataTaskWithRequest(request){
+                    data, response, error in
+                    if(error != nil){
+                        print(error)
+                    } else {
+                        dispatch_async(dispatch_get_main_queue()){
+                            let statusCode = (response as! NSHTTPURLResponse).statusCode
+                            print("API Response: \(statusCode)")
+                            self.apiResponseLabel.text = "API Response: \(statusCode)"
+                            
+                            // if successful delete from realm
+                            if statusCode == 201 {
+                                print("Locations submitted successfully")
+                                
+                                print("Attempting to remove from local queue")
+                                realm.beginWrite()
+                                realm.delete(locations)
+                                try! realm.commitWrite()
+                                print("Locations removed from queue successfully")
+                            }
+                        }
+                    }
+                }
+                
+                // kick off the task
+                task.resume()
+        
+            } else {
+                print("Unexpectedly came across an empty JSON payload when trying to submit Locations")
+            }
         }
     }
     
-    func postLocationsWith(body: String) {
-        //let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
-        let url = NSURL(string: "https://api.billglover.me/locations")
-        let session = NSURLSession.sharedSession()
-        let request = NSMutableURLRequest(URL: url!)
-        request.HTTPMethod = "POST"
+    func submitVisitsFromRealm(realm: Realm) {
         
-        request.HTTPBody = body.dataUsingEncoding(NSUTF8StringEncoding)
+        let visits = realm.objects(Visit.self)
         
-        let task = session.dataTaskWithRequest(request){
-            data, response, error in
-            if(error != nil){
-                print(error)
+        // if there are no queued visits we don't need to do anything
+        if visits.count > 0 {
+            
+            print("Queued Visits: \(visits.count)")
+            
+            // convert Results<Visit> to JSON
+            let a = visits.map({$0.asDictionary})
+            var body: String?
+            
+            do {
+                let opts = NSJSONWritingOptions()
+                let data = try NSJSONSerialization.dataWithJSONObject(a, options: opts)
+                
+                body = NSString(data: data, encoding: NSUTF8StringEncoding) as? String
             }
-            dispatch_async(dispatch_get_main_queue()){
-                print((response as! NSHTTPURLResponse).statusCode)
-                self.apiResponseLabel.text = "API Response: \((response as! NSHTTPURLResponse).statusCode)"
+            catch let e as NSException {
+                print(e.reason!)
+            }
+            catch let e as NSError {
+                print(e.localizedDescription)
             }
             
+            // check that we have a JSON string and the submit
+            if body != nil {
+                
+                // create the POST request
+                //let url = NSURL(string: "http://zhujia.dtdns.net:8080/locations")
+                let url = NSURL(string: "https://api.billglover.me/locations")
+                let session = NSURLSession.sharedSession()
+                let request = NSMutableURLRequest(URL: url!)
+                request.HTTPMethod = "POST"
+                request.HTTPBody = body!.dataUsingEncoding(NSUTF8StringEncoding)
+                
+                // create the submission task
+                let task = session.dataTaskWithRequest(request){
+                    data, response, error in
+                    if(error != nil){
+                        print(error)
+                    } else {
+                        dispatch_async(dispatch_get_main_queue()){
+                            let statusCode = (response as! NSHTTPURLResponse).statusCode
+                            print("API Response: \(statusCode)")
+                            self.apiResponseLabel.text = "API Response: \(statusCode)"
+                            
+                            // if successful delete from realm
+                            if statusCode == 201 {
+                                print("Visits submitted successfully")
+                                
+                                print("Attempting to remove from local queue")
+                                realm.beginWrite()
+                                realm.delete(visits)
+                                try! realm.commitWrite()
+                                print("Visits removed from queue successfully")
+                            }
+                        }
+                    }
+                }
+                
+                // kick off the task
+                task.resume()
+                
+            } else {
+                print("Unexpectedly came across an empty JSON payload when trying to submit Visits")
+            }
         }
-        task.resume()
     }
+
+
+    
     
     
     
@@ -307,12 +394,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         for loc in locations {
             print("Located: \(loc.coordinate) at \(loc.timestamp)")
         }
-        submitLocations(locations)
+        queueLocations(locations)
     }
     
     func locationManager(manager: CLLocationManager, didVisit visit: CLVisit) {
         print("Visited: \(visit.coordinate) at \(visit.arrivalDate)")
-        submitVisit(visit)
+        queueVisit(visit)
     }
 }
 

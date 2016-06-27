@@ -31,6 +31,23 @@ class Location: Object {
         self.detail = "location"
     }
     
+    var asDictionary: NSDictionary {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.timeZone = NSTimeZone.localTimeZone()
+        
+        let d: [String : AnyObject] = [
+            "latitude" : latitude,
+            "longitude" : longitude,
+            "altitude" : altitude,
+            "horizontalAccuracy" : horizontalAccuracy,
+            "verticalAccuracy" : verticalAccuracy,
+            "deviceTime" : formatter.stringFromDate(deviceTime),
+            "description" : detail
+        ]
+        return d
+    }
+    
     
 // Specify properties to ignore (Realm won't persist these)
     
