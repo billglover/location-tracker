@@ -27,6 +27,21 @@ class Visit: Object {
         self.detail = "visit"
     }
     
+    var asDictionary: NSDictionary {
+        let formatter = NSDateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        formatter.timeZone = NSTimeZone.localTimeZone()
+        
+        let d: [String : AnyObject] = [
+            "latitude" : latitude,
+            "longitude" : longitude,
+            "horizontalAccuracy" : horizontalAccuracy,
+            "deviceTime" : formatter.stringFromDate(deviceTime),
+            "description" : detail
+        ]
+        return d
+    }
+    
 // Specify properties to ignore (Realm won't persist these)
     
 //  override static func ignoredProperties() -> [String] {
