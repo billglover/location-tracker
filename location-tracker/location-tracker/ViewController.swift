@@ -49,7 +49,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+        restoreSwitchStates();
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ViewController.saveSwitchStates), name: "kSaveSwitchStatesNotification", object: nil);
+        
         locationManager.delegate = self
         
     }
@@ -326,6 +329,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     // MARK:- User Action
     @IBAction func trackVisitsToggled(sender: UISwitch) {
         print("broadcastVisits to \(sender.on)")
+        saveSwitchStates()
         
         if sender.on {
             startBroadcastingVisits()
@@ -337,12 +341,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBAction func trackLocationToggled(sender: UISwitch) {
         print("broadcastLocations to \(sender.on)")
+        saveSwitchStates()
         
         if sender.on {
             startBroadcastingLocation()
         } else {
             stopBroadcastingLocation()
         }
+    }
+    
+    func restoreSwitchStates() {
+        print("restoring switch states")
+        trackVisitsToggle!.on = NSUserDefaults.standardUserDefaults().boolForKey("trackVisitsToggle")
+        trackLocationToggle!.on = NSUserDefaults.standardUserDefaults().boolForKey("trackLocationToggle")
+    }
+    
+    func saveSwitchStates() {
+        print("saving switch states")
+        NSUserDefaults.standardUserDefaults().setBool(trackVisitsToggle!.on, forKey: "trackVisitsToggle")
+        NSUserDefaults.standardUserDefaults().setBool(trackLocationToggle!.on, forKey: "trackLocationToggle")
+        NSUserDefaults.standardUserDefaults().synchronize()
     }
     
     @IBAction func postLocationPressed(sender: UIButton) {
